@@ -1,0 +1,29 @@
+{
+  "name": "healthforge-elm",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start.dev": "nodemon index.js && npm run elm-live",
+    "startmon": "nodemon index.js",
+    "elm-live": "elm-live --output=public/js/main.js src/elm/Main.elm --pushstate --open",
+    "elm-live.debug": "elm-live --output=public/js/main.js src/elm/Main.elm --pushstate --open --debug"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "elm": "^0.18.0",
+    "elm-live": "^2.7.5",
+    "express": "^4.15.4",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.0",
+    "eslint": "^4.6.1",
+    "eslint-config-prettier": "^2.4.0",
+    "eslint-plugin-prettier": "^2.2.0",
+    "nodemon": "^1.12.0",
+    "prettier": "^1.6.1"
+  }
+}
