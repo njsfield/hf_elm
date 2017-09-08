@@ -3,9 +3,7 @@
     "summary": "An app to lookup patient data",
     "repository": "https://github.com/njsfield/project.git",
     "license": "BSD3",
-    "source-directories": [
-        ["src/elm"]
-    ],
+    "source-directories": ["src/elm"],
     "exposed-modules": [],
     "native-modules": true,
     "dependencies": {
