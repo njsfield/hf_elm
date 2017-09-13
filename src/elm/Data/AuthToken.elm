@@ -8,6 +8,17 @@ type AuthToken
 
 
 
+-- We need to decode token when server returns it
+-- After log in request
+
+
+decoder : Decoder AuthToken
+decoder =
+    Decode.string
+        |> Decode.map AuthToken
+
+
+
 {- withAuthorization
    Initialise a GET request builder
    by preparing Authorization (Bearer) header

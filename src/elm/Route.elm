@@ -1,8 +1,8 @@
 module Route exposing (Route(..), fromLocation, href, modifyUrl)
 
--- Use PatientID to define route param on patient record
+-- Use PatientID from Profile to define route param on patient record
 
-import Data.Patient as Patient exposing (PatientId)
+import Data.Profile as Profile exposing (PatientId)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Navigation exposing (Location)
@@ -17,11 +17,11 @@ type Route
     = Home
     | Login
     | Logout
-    | Patient PatientId
+    | Profile PatientId
 
 
 
--- Use oneOf
+-- Use oneOf for route matching
 
 
 route : Parser (Route -> a) a
@@ -30,7 +30,7 @@ route =
         [ Url.map Home (s "")
         , Url.map Login (s "login")
         , Url.map Logout (s "logout")
-        , Url.map Patient (s "patient" </> Patient.patientIdParser)
+        , Url.map Profile (s "profile" </> string)
         ]
 
 
@@ -41,7 +41,7 @@ route =
    /
    /login
    /logout
-   /patient/20dj3sdgiw
+   /profile/20dj3sdgiw
 
 -}
 
@@ -60,8 +60,8 @@ routeToString page =
                 Logout ->
                     [ "logout" ]
 
-                Patient patientId ->
-                    [ "patient", Patient.patientIdToString patientId ]
+                Profile patientId ->
+                    [ "profile", patientId ]
     in
         "#/" ++ String.join "/" pieces
 

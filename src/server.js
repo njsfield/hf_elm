@@ -53,12 +53,12 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 // Serve main app
-app.get('/*', function(req, res) {
+app.get('/*', (__, res) => {
   res.sendFile(path.join(staticPath, 'index.html'));
 });
 
 // Post to login
-app.post('/login', function(req, res) {
+app.post('/login', (req, res) => {
   const { username, password } = req.body;
   // Authenticate username & password
   loginRequest(username, password)

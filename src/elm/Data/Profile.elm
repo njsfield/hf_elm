@@ -1,7 +1,9 @@
-module Data.Patient exposing (Patient, PatientId, patientDecoder, patientsDecoder)
+module Data.Profile exposing (Profile, PatientId, decoder)
 
 import Json.Decode as Decode exposing (Decoder, at)
 import Json.Decode.Pipeline as Pipeline exposing (decode, required, custom)
+import UrlParser
+import Util exposing ((=>))
 
 
 -- Patient model for patient profile
@@ -9,7 +11,7 @@ import Json.Decode.Pipeline as Pipeline exposing (decode, required, custom)
 -- Basic info and available addresses
 
 
-type alias Patient =
+type alias Profile =
     { patient_id : PatientId
     , prefix : String
     , first_name : String
@@ -36,17 +38,7 @@ type alias PatientAddress =
 
 
 
--- patientsDecoder (Main)
--- Parse list of patients at "content" field
-
-
-patientsDecoder : Decode (List Patient)
-patientsDecoder =
-    at [ "content" ] (Decode.list patientDecoder)
-
-
-
-{- Patient Decoder
+{- Main Decoder
    Patient_id is resolved by retrieving the 'value' key from the first
    array item in the 'identifiers' key
 
@@ -58,15 +50,16 @@ patientsDecoder =
 -}
 
 
-patientDecoder : Decoder Patient
-patientDecoder =
+decoder : Decoder Profile
+decoder =
     decode Patient
-        |> custom (at [ "identifiers" ] (listHeadDecoder <| at [ "value" ] Decode.string))
+        |> custom (at [ "identifiers" ] <| Decode.index 0 <| at [ "value" ] Decode.string)
         |> required "prefix" Decode.string
         |> required "firstName" Decode.string
         |> required "lastName" Decode.string
         |> required "active" Decode.bool
-        |> custom (at [ "addresses" ] (Decode.list addressDecoder))
+        |> required "dateOfBirth" Decode.string
+        |> custom (at [ "addresses" ] <| Decode.list addressDecoder)
 
 
 addressDecoder : Decoder PatientAddress
@@ -75,8 +68,3 @@ addressDecoder =
         |> required "line1" Decode.string
         |> required "country" Decode.string
         |> required "zipCode" Decode.string
-
-
-listHeadDecoder : Decoder String -> Decoder String
-listHeadDecoder nextDecoder =
-    Decode.map (\lst -> Maybe.withDefault "" <| List.head lst) <| Decode.list nextDecoder

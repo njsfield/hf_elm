@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Data.Session as Session exposing (Session)
-import Data.Patient as Patient exposing (Patient, PatientId)
+import Data.Profile exposing (PatientId)
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
@@ -9,7 +9,7 @@ import Page.Errored as Errored exposing (PageLoadError)
 import Page.Home as Home
 import Page.Login as Login
 import Page.NotFound as NotFound
-import Page.Patient as Profile
+import Page.Profile as Profile
 import Ports
 import Route exposing (Route)
 import Task
@@ -34,7 +34,7 @@ type Page
     | Errored PageLoadError
     | Home Home.Model
     | Login Login.Model
-    | Patient PatientId Patient.Model
+    | Profile PatientId Profile.Model
 
 
 
@@ -141,10 +141,10 @@ viewPage session isLoading page =
                     |> layout Page.Other
                     |> Html.map LoginMsg
 
-            Patient patientId subModel ->
-                Patient.view session subModel
-                    |> layout (Page.Patient patientId)
-                    |> Html.map PatientMsg
+            Profile patientId subModel ->
+                Profile.view session subModel
+                    |> layout (Page.Profile patientId)
+                    |> Html.map ProfileMsg
 
 
 
@@ -174,11 +174,11 @@ getPage pageState =
 type Msg
     = SetRoute (Maybe Route)
     | HomeLoaded (Result PageLoadError Home.Model)
-    | PatientLoaded PatientId (Result PageLoadError Patient.Model)
+    | ProfileLoaded Patient (Result PageLoadError Profile.Model)
     | HomeMsg Home.Msg
     | SetSession (Maybe AuthToken)
     | LoginMsg Login.Msg
-    | PatientMsg Patient.Msg
+    | ProfileMsg Profile.Msg
     | LoadToken (Maybe Authtoken)
     | SaveToken Authtoken
     | NoOp
@@ -234,8 +234,9 @@ setRoute maybeRoute model =
                             , Route.modifyUrl Route.Login
                             ]
 
-            Just (Route.PatientId patientId) ->
-                transition (PatientLoaded patientId) (Patient.init model.session patientId)
+            -- Call init function for Profile
+            Just (Route.Profile patientId) ->
+                transition (ProfileLoaded patientId) (Profile.init model.session patientId)
 
 
 
@@ -320,10 +321,10 @@ updatePage page msg model =
             ( HomeLoaded (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none
 
-            ( PatientLoaded patientId (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Patient patientId subModel) } => Cmd.none
+            ( ProfileLoaded patientId (Ok subModel), _ ) ->
+                { model | pageState = Loaded (Profile patientId subModel) } => Cmd.none
 
-            ( PatientLoaded patientId (Err error), _ ) ->
+            ( ProfileLoaded patientId (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none
 
             -- (For Logging out mainly)
@@ -377,8 +378,8 @@ updatePage page msg model =
             ( HomeMsg subMsg, Home subModel ) ->
                 toPage Home HomeMsg (Home.update session) subMsg subModel
 
-            ( PatientMsg subMsg, Patient patientId subModel ) ->
-                toPage (Patient patientId) PatientMsg (Patient.update session) subMsg subModel
+            ( ProfileMsg subMsg, Profile patientId subModel ) ->
+                toPage (Profile patientId) ProfileMsg (Profile.update session) subMsg subModel
 
             -- (After init & token loaded)
             -- Attempt to navigate to home via
